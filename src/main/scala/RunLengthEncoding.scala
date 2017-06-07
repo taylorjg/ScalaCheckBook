@@ -1,18 +1,21 @@
+import scala.annotation.tailrec
+
 object RunLengthEncoding {
 
   def runLengthEnc[A](xs: List[A]): List[(Int, A)] = {
-    def loop(ys: List[A], currTuple: Option[(Int, A)], acc: List[(Int, A)]): List[(Int, A)] = {
+    @tailrec
+    def loop(ys: List[A], maybeTuple: Option[(Int, A)], acc: List[(Int, A)]): List[(Int, A)] = {
       ys match {
-        case hd :: tl =>
-          currTuple match {
-            case Some(t @ (n, c)) =>
-              if (hd == c) loop(tl, Some(n + 1, c), acc)
-              else loop(tl, Some(1, hd), acc :+ t)
-            case _ => loop(tl, Some(1, hd), acc)
+        case curr :: rest =>
+          maybeTuple match {
+            case Some(tuple @ (n, prev)) =>
+              if (curr == prev) loop(rest, Some(n + 1, prev), acc)
+              else loop(rest, Some(1, curr), acc :+ tuple)
+            case _ => loop(rest, Some(1, curr), acc)
           }
         case _ =>
-          currTuple match {
-            case Some(t) => acc :+ t
+          maybeTuple match {
+            case Some(tuple) => acc :+ tuple
             case _ => acc
           }
       }
