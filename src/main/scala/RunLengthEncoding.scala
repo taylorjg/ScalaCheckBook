@@ -26,4 +26,12 @@ object RunLengthEncoding {
   def runLengthDec[A](r: List[(Int, A)]): List[A] = {
     r flatMap { case (n, x) => List.fill(n)(x) }
   }
+
+  def runLengthEncStream[A](xs: Stream[A]): Stream[(Int, A)] = {
+    ???
+  }
+
+  def runLengthDecStream[A](r: Stream[(Int, A)]): Stream[A] = {
+    r flatMap { case (n, x) => Stream.fill(n)(x) }
+  }
 }
