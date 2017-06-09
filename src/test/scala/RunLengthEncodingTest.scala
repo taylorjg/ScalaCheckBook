@@ -20,5 +20,10 @@ object RunLengthEncodingTest extends Properties("Run length encoding") {
   }
 
   property("roundTrip") = Prop.forAll(genOutput) { r =>
-    runLengthEnc(runLengthDec(r)) == r }
+    runLengthEnc(runLengthDec(r)) == r
+  }
+
+  property("roundTrip (streaming)") = Prop.forAll(genOutput) { r =>
+    runLengthEncStream(runLengthDecStream(r.toStream)).toList == r
+  }
 }

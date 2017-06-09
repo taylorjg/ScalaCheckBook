@@ -27,43 +27,22 @@ object RunLengthEncoding {
     r flatMap { case (n, x) => List.fill(n)(x) }
   }
 
-//  def runLengthEncStream[A](xs: Stream[A]): Stream[(Int, A)] = {
-//
-//    def f(ys: Stream[A]): (Option[(Int, A)], Stream[A]) =
-//      ys match {
-//        case y #:: _ =>
-//          val (same, different) = ys.span(_ == y)
-//          val n = same.length
-//          (Some((n, y)), different)
-//        case _ => (None, Stream.empty)
-//      }
-//
-//    def nextTuple(ys: Stream[A]): Stream[(Int, A)] =
-//      f(ys) match {
-//        case (Some(tuple), rest) => Stream.cons(tuple, nextTuple(rest))
-//        case _ => Stream.empty
-//      }
-//
-//    nextTuple(xs)
-//  }
-
   def runLengthEncStream[A](xs: Stream[A]): Stream[(Int, A)] = {
 
-    def loop(ys: Stream[A]): Stream[(Int, A)] = {
-      (ys match {
-        case y #:: _ =>
-          val (same, rest) = ys.span(_ == y)
-          val n = same.length
-          val tuple = (n, y)
-          Some(tuple, rest)
-        case _ => None
-      }) match {
-        case Some((tuple, rest)) => Stream.cons(tuple, loop(rest))
-        case _ => Stream.empty
-      }
+    val maybePair = xs match {
+      case hd #:: _ =>
+        val (hds, remainder) = xs.span(_ == hd)
+        val n = hds.length
+        val tuple = (n, hd)
+        Some(tuple, remainder)
+      case _ =>
+        None
     }
 
-    loop(xs)
+    maybePair match {
+      case Some((tuple, remainder)) => Stream.cons(tuple, runLengthEncStream(remainder))
+      case None => Stream.empty
+    }
   }
 
   def runLengthDecStream[A](r: Stream[(Int, A)]): Stream[A] = {
