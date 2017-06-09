@@ -27,23 +27,16 @@ object RunLengthEncoding {
     r flatMap { case (n, x) => List.fill(n)(x) }
   }
 
-  def runLengthEncStream[A](xs: Stream[A]): Stream[(Int, A)] = {
-
-    val maybePair = xs match {
+  def runLengthEncStream[A](xs: Stream[A]): Stream[(Int, A)] =
+    xs match {
       case hd #:: _ =>
         val (hds, remainder) = xs.span(_ == hd)
         val n = hds.length
         val tuple = (n, hd)
-        Some(tuple, remainder)
+        Stream.cons(tuple, runLengthEncStream(remainder))
       case _ =>
-        None
+        Stream.empty
     }
-
-    maybePair match {
-      case Some((tuple, remainder)) => Stream.cons(tuple, runLengthEncStream(remainder))
-      case None => Stream.empty
-    }
-  }
 
   def runLengthDecStream[A](r: Stream[(Int, A)]): Stream[A] = {
     r flatMap { case (n, x) => Stream.fill(n)(x) }
