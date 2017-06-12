@@ -21,7 +21,7 @@ object RunLengthEncoding {
         val (hds, remainder) = xs.span(_ == hd)
         val n = hds.length
         val tuple = (n, hd)
-        Stream.cons(tuple, runLengthEncStream(remainder))
+        tuple #:: runLengthEncStream(remainder)
       case _ =>
         Stream.empty
     }
